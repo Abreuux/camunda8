@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Enrichment System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-white mb-4">Lead Enrichment System</h1>
+                <p class="text-gray-200">Enhance your leads with AI-powered insights</p>
+            </div>
+
+            <div class="card rounded-lg p-8 shadow-xl">
+                <form id="leadForm" class="space-y-6">
+                    <!-- Lead Name -->
+                    <div>
+                        <label for="leadName" class="block text-sm font-medium text-gray-200 mb-2">Lead Name *</label>
+                        <div class="relative">
+                            <input type="text" id="leadName" name="leadName" required
+                                class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-10 border border-gray-300 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder="Enter lead name">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-200 mb-2">Email</label>
+                        <div class="relative">
+                            <input type="email" id="email" name="email"
+                                class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-10 border border-gray-300 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder="Enter email address">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Company -->
+                    <div>
+                        <label for="company" class="block text-sm font-medium text-gray-200 mb-2">Company</label>
+                        <div class="relative">
+                            <input type="text" id="company" name="company"
+                                class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-10 border border-gray-300 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder="Enter company name">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <i class="fas fa-building text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-200">
+                        <i class="fas fa-magic mr-2"></i>Enrich Lead
+                    </button>
+                </form>
+
+                <!-- Results Section -->
+                <div id="result" class="mt-6 hidden">
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline" id="resultMessage"></span>
+                    </div>
+
+                    <!-- Enrichment Status -->
+                    <div id="enrichmentStatus" class="mt-4 space-y-4 hidden">
+                        <h3 class="text-lg font-medium text-white">Enrichment Progress</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 rounded-full bg-gray-300" id="validateStatus"></div>
+                                <span class="ml-2 text-gray-200">Validating Lead Data</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 rounded-full bg-gray-300" id="enrichStatus"></div>
+                                <span class="ml-2 text-gray-200">Enriching Lead Data</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 rounded-full bg-gray-300" id="storeStatus"></div>
+                                <span class="ml-2 text-gray-200">Storing Results</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enriched Data -->
+                    <div id="enrichedData" class="mt-6 hidden">
+                        <h3 class="text-lg font-medium text-white mb-4">Enriched Lead Data</h3>
+                        <div class="space-y-4">
+                            <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                                <h4 class="text-purple-300 font-medium mb-2">ChatGPT Insights</h4>
+                                <pre id="chatgptInsights" class="text-gray-200 whitespace-pre-wrap"></pre>
+                            </div>
+                            <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                                <h4 class="text-purple-300 font-medium mb-2">LinkedIn Data</h4>
+                                <pre id="linkedinData" class="text-gray-200 whitespace-pre-wrap"></pre>
+                            </div>
+                            <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                                <h4 class="text-purple-300 font-medium mb-2">Company Data</h4>
+                                <pre id="companyData" class="text-gray-200 whitespace-pre-wrap"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="loading" class="mt-6 hidden">
+                    <div class="flex items-center justify-center">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                        <span class="ml-2 text-gray-200">Processing...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let processId = null;
+        let statusCheckInterval = null;
+
+        document.getElementById('leadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                leadName: document.getElementById('leadName').value,
+                email: document.getElementById('email').value,
+                company: document.getElementById('company').value
+            };
+            
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const resultMessage = document.getElementById('resultMessage');
+            const enrichmentStatus = document.getElementById('enrichmentStatus');
+            const enrichedData = document.getElementById('enrichedData');
+            
+            loading.classList.remove('hidden');
+            result.classList.add('hidden');
+            enrichmentStatus.classList.add('hidden');
+            enrichedData.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/api/leads', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    processId = data.processInstanceId;
+                    resultMessage.textContent = `Process started successfully! Process ID: ${processId}`;
+                    result.classList.remove('hidden');
+                    enrichmentStatus.classList.remove('hidden');
+                    
+                    // Start checking status
+                    startStatusCheck();
+                } else {
+                    throw new Error(data.error || 'Failed to start process');
+                }
+            } catch (error) {
+                resultMessage.textContent = `Error: ${error.message}`;
+                result.classList.remove('hidden');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        });
+
+        function startStatusCheck() {
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+            }
+            
+            statusCheckInterval = setInterval(checkStatus, 2000);
+        }
+
+        async function checkStatus() {
+            if (!processId) return;
+            
+            try {
+                const response = await fetch(`/api/leads/${processId}`);
+                const data = await response.json();
+                
+                updateStatus(data);
+                
+                if (data.status === 'completed') {
+                    clearInterval(statusCheckInterval);
+                    showEnrichedData(data.variables);
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        function updateStatus(data) {
+            const validateStatus = document.getElementById('validateStatus');
+            const enrichStatus = document.getElementById('enrichStatus');
+            const storeStatus = document.getElementById('storeStatus');
+            
+            if (data.variables && data.variables.leadValid) {
+                validateStatus.classList.add('bg-green-500');
+                validateStatus.classList.remove('bg-gray-300');
+            }
+            
+            if (data.variables && data.variables.enrichedData) {
+                enrichStatus.classList.add('bg-green-500');
+                enrichStatus.classList.remove('bg-gray-300');
+            }
+            
+            if (data.variables && data.variables.storageSuccess) {
+                storeStatus.classList.add('bg-green-500');
+                storeStatus.classList.remove('bg-gray-300');
+            }
+        }
+
+        function showEnrichedData(variables) {
+            const enrichedData = document.getElementById('enrichedData');
+            const chatgptInsights = document.getElementById('chatgptInsights');
+            const linkedinData = document.getElementById('linkedinData');
+            const companyData = document.getElementById('companyData');
+            
+            if (variables.enrichedData) {
+                chatgptInsights.textContent = variables.enrichedData.insights;
+                linkedinData.textContent = JSON.stringify(variables.linkedinData, null, 2);
+                companyData.textContent = JSON.stringify(variables.companyData, null, 2);
+                
+                enrichedData.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html> 
