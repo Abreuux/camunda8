@@ -21,6 +21,11 @@ ZEEBE_AUTHORIZATION_SERVER_URL = os.getenv('ZEEBE_AUTHORIZATION_SERVER_URL')
 CAMUNDA_CLUSTER_ID = os.getenv('CAMUNDA_CLUSTER_ID')
 CAMUNDA_REGION = os.getenv('CAMUNDA_REGION')
 
+# Log configuration for debugging
+logger.info(f"ZEEBE_ADDRESS: {ZEEBE_ADDRESS}")
+logger.info(f"CLUSTER_ID: {CAMUNDA_CLUSTER_ID}")
+logger.info(f"REGION: {CAMUNDA_REGION}")
+
 def validate_email(email: str) -> bool:
     """Validate email format"""
     if not email:
@@ -38,24 +43,33 @@ async def handle_validate_lead(job: Job) -> Dict[str, Any]:
 
         logger.info(f"Validating lead: {lead_name}, {email}, {company}")
 
-        # Validate required fields
-        if not lead_name:
+        # Validate all fields are filled
+        if not lead_name or not email or not company:
+            missing_fields = []
+            if not lead_name:
+                missing_fields.append("Lead name")
+            if not email:
+                missing_fields.append("Email")
+            if not company:
+                missing_fields.append("Company")
+                
             return {
                 'leadValid': False,
-                'validationMessage': 'Lead name is required'
+                'validationMessage': f'Missing required fields: {", ".join(missing_fields)}'
             }
 
-        # Validate email format if provided
-        if email and not validate_email(email):
+        # Validate email format
+        if not validate_email(email):
             return {
                 'leadValid': False,
                 'validationMessage': 'Invalid email format'
             }
 
-        # All validations passed
+        # All validations passed (todos os campos preenchidos)
+        logger.info("Lead validation successful - all fields are filled")
         return {
             'leadValid': True,
-            'validationMessage': 'Lead data is valid'
+            'validationMessage': 'Lead data is valid - all fields are filled'
         }
 
     except Exception as e:
